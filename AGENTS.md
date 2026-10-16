@@ -1,3 +1,5 @@
+> Fork: read `custom/AGENTS.md` first, its rules win over this file.
+
 # omp-web - Development Notes
 
 ## Quick Start
