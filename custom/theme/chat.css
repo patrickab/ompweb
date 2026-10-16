@@ -12,6 +12,11 @@
   box-shadow: var(--shadow-pop), var(--cf-inner-highlight) !important;
 }
 
+/* Reasoning picker: drop the "applies to next prompt" footer, the active level is already checked in the list */
+.picker-panel-footer {
+  display: none;
+}
+
 /* Tool rows: neutral chrome. Tool type is in the label, success is the default state, only errors carry color. */
 .activity-tool-icon,
 .activity-tool-icon * {
