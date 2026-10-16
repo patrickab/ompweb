@@ -1,0 +1,87 @@
+/* App shell: topbar and sidebar.
+
+   Upstream sets most of these styles inline, so `!important` is the only override.
+   Selectors use upstream class hooks only: if one stops matching after a rebase, that rule is inert, never broken. */
+
+/* Topbar: on the page, no divider */
+.shell-topbar {
+  background: var(--bg) !important;
+  border-bottom-color: transparent !important;
+}
+.shell-topbar-breadcrumb {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Sidebar: page-colored rail, no dividers inside */
+nav.sidebar-container {
+  background: var(--bg) !important;
+  border-right-color: transparent !important;
+}
+nav.sidebar-container section,
+nav.sidebar-container .sidebar-settings-row {
+  border-top-color: transparent !important;
+  background-color: transparent !important;
+}
+nav.sidebar-container .sidebar-settings-row:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+/* Desktop: the sidebar is a Coolfrog panel. The mobile drawer (<= 640px) keeps upstream layout.
+   Width stays fixed like upstream's `.sidebar-container > *` rule, so collapsing does not reflow it. */
+@media (min-width: 641px) {
+  nav.sidebar-container > .sidebar-shell {
+    margin: 12px;
+    width: calc(var(--sidebar-width, 260px) - 24px);
+    min-width: calc(var(--sidebar-width, 260px) - 24px);
+    height: calc(100% - 24px) !important;
+    border-radius: var(--radius-card);
+    background: var(--bg-panel);
+    box-shadow: var(--shadow-card), var(--cf-inner-highlight);
+  }
+}
+
+/* App name: plain title, like Coolfrog's */
+nav.sidebar-container button:has(> svg[aria-label="omp logo"]) {
+  font-family: inherit !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text) !important;
+}
+nav.sidebar-container button:has(> svg[aria-label="omp logo"]) * {
+  color: inherit !important;
+}
+
+/* Primary action: ink button, paper text */
+.sidebar-new-session {
+  background: var(--cf-ink) !important;
+  color: var(--cf-paper) !important;
+  border-color: transparent !important;
+  border-radius: 12px !important;
+}
+.sidebar-new-session:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* Project rows: names in the UI font, selection as a tinted row instead of an accent bar */
+.sidebar-project-header :is(span, button) {
+  font-family: inherit !important;
+}
+.sidebar-project-header {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Row menus appear on hover or keyboard focus (hidden until needed). Touch devices keep them visible. */
+@media (hover: hover) {
+  .session-item-row:not(:hover, :focus-within) .session-item-menu-button,
+  .sidebar-project-header:not(:hover, :focus-within) .sidebar-project-actions {
+    opacity: 0;
+  }
+}
+
+/* Provider usage: a value, not code */
+nav.sidebar-container section button span {
+  font-family: inherit !important;
+}

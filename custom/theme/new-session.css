@@ -1,0 +1,29 @@
+/* New-session screen: workspace and composer only.
+
+   Brand row (logo, wordmark, versions) and the slogan are hidden: no logos or marketing copy.
+   Versions stay reachable from the sidebar title and Settings. */
+
+.empty-chat-brand,
+.empty-session-intro {
+  display: none !important;
+}
+
+/* Workspace picker as a Coolfrog panel */
+.new-session-workspace {
+  background: var(--bg-panel) !important;
+  border-color: transparent !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-card), var(--cf-inner-highlight) !important;
+}
+.new-session-workspace-label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted) !important;
+}
+.new-session-workspace-control :is(select, button) {
+  background: var(--bg) !important;
+  border-color: transparent !important;
+  border-radius: 12px !important;
+}

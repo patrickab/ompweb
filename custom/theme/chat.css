@@ -1,0 +1,22 @@
+/* Conversation: messages and the composer. */
+
+/* User message: tinted bubble, no accent bar */
+.chat-message-card:has(.markdown-user-message) {
+  border-left: none !important;
+}
+
+/* Composer: elevated panel, shadow instead of outline */
+.chat-input-shell {
+  background: var(--cf-elevated) !important;
+  border-color: transparent !important;
+  box-shadow: var(--shadow-pop), var(--cf-inner-highlight) !important;
+}
+
+/* Tool rows: neutral chrome. Tool type is in the label, success is the default state, only errors carry color. */
+.activity-tool-icon,
+.activity-tool-icon * {
+  color: var(--text-dim) !important;
+}
+.activity-row-indicator:not(.activity-row-indicator-error) {
+  color: var(--text-dim);
+}

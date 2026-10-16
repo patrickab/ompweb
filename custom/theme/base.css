@@ -1,0 +1,50 @@
+/* Page-wide type and interaction, plus switching off upstream decoration.
+
+   Coolfrog rule: every style serves structure, state, hierarchy or readability. Upstream's
+   Midnight extras (dotted grid, link sweep, wordmark shimmer, gradient logo) do none of these. */
+
+:root:root,
+:root:root body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root:root ::selection {
+  background: color-mix(in oklab, var(--cf-ink) 14%, transparent);
+  color: var(--text);
+}
+
+:root:root :focus-visible {
+  outline-color: color-mix(in oklab, var(--cf-ink) 40%, transparent);
+}
+
+/* Midnight decoration */
+:root:root.omp body {
+  background: var(--bg);
+}
+:root:root.omp .markdown-body a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+:root:root.omp .markdown-body a::after {
+  content: none;
+}
+:root:root .omp-wordmark {
+  animation: none;
+  background: none;
+  color: var(--text);
+}
+
+/* Logo: branding, not information. `omp logo` is OmpWebLogo's default label, never localized. */
+svg[aria-label="omp logo"] {
+  display: none !important;
+}
+
+/* Display headings: semibold sans, not serif */
+:root:root .display-serif {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}

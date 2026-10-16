@@ -1,0 +1,40 @@
+/* Role tokens per mode, the only place colors are defined. Add a palette by overriding these.
+
+   - Light applies to every theme, dark to every dark one (upstream marks them `.dark`, or `.omp` for Midnight)
+   - `:root:root` (0,2,0) outranks upstream's theme blocks (0,1,1) regardless of load order
+   - Warm OKLCH, hue 85: light from ~/git/cool-frog, dark from ~/git/gigachad-bot
+   - Contrast on --cf-paper: ink-subtle 4.76:1 (light) and 5.38:1 (dark), AA for small text */
+
+:root:root {
+  color-scheme: light;
+  --cf-ink: oklch(30% 0.012 85);
+  --cf-ink-muted: oklch(46% 0.012 85);
+  --cf-ink-subtle: oklch(52% 0.012 85);
+  --cf-paper: oklch(95% 0.020 85);
+  --cf-surface: oklch(97.5% 0.012 85);
+  --cf-elevated: oklch(99% 0.006 85);
+  --cf-danger: oklch(52% 0.22 25);
+  --cf-success: oklch(50% 0.12 155);
+  --cf-warning: oklch(55% 0.13 75);
+  --cf-info: oklch(50% 0.13 255);
+  --cf-shadow-faint: color-mix(in oklab, oklch(35% 0.01 85) 4%, transparent);
+  --cf-shadow-soft: color-mix(in oklab, oklch(35% 0.01 85) 7%, transparent);
+  --cf-inner-highlight: inset 0 1px 0 0 oklch(100% 0 0 / 0.5);
+}
+
+:root:root:is(.dark, .omp) {
+  color-scheme: dark;
+  --cf-ink: oklch(92% 0.007 83);
+  --cf-ink-muted: oklch(70% 0.011 83);
+  --cf-ink-subtle: oklch(64% 0.011 83);
+  --cf-paper: oklch(20% 0.006 83);
+  --cf-surface: oklch(25% 0.007 83);
+  --cf-elevated: oklch(31% 0.008 83);
+  --cf-danger: oklch(68% 0.20 25);
+  --cf-success: oklch(76% 0.13 155);
+  --cf-warning: oklch(80% 0.13 80);
+  --cf-info: oklch(74% 0.12 255);
+  --cf-shadow-faint: color-mix(in oklab, oklch(10% 0.011 83) 20%, transparent);
+  --cf-shadow-soft: color-mix(in oklab, oklch(10% 0.011 83) 32%, transparent);
+  --cf-inner-highlight: inset 0 1px 0 0 oklch(100% 0 0 / 0.04);
+}

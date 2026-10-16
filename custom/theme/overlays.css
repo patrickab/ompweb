@@ -1,0 +1,9 @@
+/* Floating surfaces: menus, pickers, the command palette. Elevated, shadow instead of outline. */
+
+.dropdown-surface,
+.picker-panel {
+  background: var(--cf-elevated);
+  border-color: transparent;
+  border-radius: 12px;
+  box-shadow: var(--shadow-pop), var(--cf-inner-highlight);
+}

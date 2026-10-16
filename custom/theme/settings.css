@@ -1,0 +1,15 @@
+/* Settings page: on the page, cards as Coolfrog panels. */
+
+.settings-header,
+.settings-nav {
+  background: var(--bg);
+  border-color: transparent;
+}
+
+.settings-card {
+  border-color: transparent;
+  box-shadow: var(--shadow-card), var(--cf-inner-highlight);
+}
+.settings-card:hover {
+  border-color: transparent;
+}
