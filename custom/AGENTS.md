@@ -34,7 +34,8 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 ## Extension points
 
 - **Styling**: CSS in `custom/theme/`, see "Theme layer"
-- **Replace an upstream module**: add a file at the same path under `custom/overrides/`, e.g. `custom/overrides/components/ThemeSwitcher.tsx` replaces `components/ThemeSwitcher.tsx`. Keep its exports' names and signatures. `custom/next.config.ts` picks it up (Turbopack alias for `next dev`, webpack replacement for `next build`), restart the dev server after adding one. A replacement can't import the module it replaces
+- **Replace an upstream module**: add a file at the same path under `custom/overrides/`, e.g. `custom/overrides/components/ThemeSwitcher.tsx` replaces `components/ThemeSwitcher.tsx`. Keep its exports' names and signatures. `custom/next.config.ts` picks it up (Turbopack alias for `next dev`, webpack replacement for `next build`), restart the dev server after adding one
+- **Wrap an upstream module**: the replacement imports the original by a relative path (`../../../components/X`), which neither bundler redirects. Never `@/components/X` or `./X`, those resolve back to the replacement. Type its props as `ComponentProps<typeof UpstreamX>`, so an upstream prop change fails `tsc`
 - **Add app-wide behavior**: render it from `CustomRoot` in `custom/root.tsx`, e.g. `SelectEnhancer`, which gives every native `<select>` a styled listbox under a mouse (touch keeps the native picker)
 
 Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed).
