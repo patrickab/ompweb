@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
+import { withCustom } from "./custom/next.config";
 
 // The WASM SWC build used on wasm-first targets (e.g. aarch64-linux-android)
 // does not transpile ESM to CJS, so this file loads as ESM there and
@@ -126,4 +127,4 @@ const nextConfig = (phase: string): NextConfig => {
   };
 };
 
-export default nextConfig;
+export default withCustom(nextConfig);

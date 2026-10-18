@@ -26,7 +26,16 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 | Upstream file | Seam | Points at |
 |---|---|---|
 | `app/layout.tsx` | `import "@/custom/theme";` after `import "./globals.css";` | `custom/theme/index.ts` |
+| `next.config.ts` | `import { withCustom } from "./custom/next.config";` | `custom/next.config.ts` |
+| `next.config.ts` | `export default withCustom(nextConfig);` | module overrides, see below |
 | `AGENTS.md` | pointer line at the top | this file |
+
+## Extension points
+
+- **Styling**: CSS in `custom/theme/`, see "Theme layer"
+- **Replace an upstream module**: add a file at the same path under `custom/overrides/`, e.g. `custom/overrides/components/ThemeSwitcher.tsx` replaces `components/ThemeSwitcher.tsx`. Keep its exports' names and signatures. `custom/next.config.ts` picks it up (Turbopack alias for `next dev`, webpack replacement for `next build`), restart the dev server after adding one. A replacement can't import the module it replaces
+
+Current overrides: none.
 
 ## Theme layer (`custom/theme/`)
 
