@@ -84,4 +84,5 @@ Decide case by case, these cost conflict risk or maintenance:
 ## Run
 
 - `./run.sh`: production on 30177, rebuilds when a source file is newer than the last build
+  - Drops `.next/cache` first when `next.config.ts`, `custom/next.config.ts` or `custom/overrides/` changed: webpack's persistent cache keeps resolving the old replacement ("Can't resolve '../../../components/…'")
 - `npm run dev`: hot reload on 30178. `rm -rf .next` when switching from a build to dev
