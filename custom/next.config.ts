@@ -1,6 +1,7 @@
 import { readdirSync } from "fs";
 import { basename, join } from "path";
 import type { NextConfig } from "next";
+import { withFraming } from "./framing";
 
 type WebpackConfig = Parameters<NonNullable<NextConfig["webpack"]>>[0];
 
@@ -33,14 +34,15 @@ function upstreamFilePattern(override: ModuleOverride): RegExp {
 }
 
 /**
- * Apply the fork's module overrides (`custom/overrides/<upstream path>`) to upstream's Next config.
+ * Apply the fork's changes to upstream's Next config.
  *
- * - `next dev` runs Turbopack, `next build --webpack` runs webpack, so both get the overrides
+ * - Module overrides: `next dev` runs Turbopack, `next build --webpack` runs webpack, so both get them
  * - A replacement must not import the module it replaces, the alias would point back at itself
+ * - Framing by configured origins, see `custom/framing.ts`
  */
 export function withCustom(upstreamConfig: (phase: string) => NextConfig) {
   return (phase: string): NextConfig => {
-    const config = upstreamConfig(phase);
+    const config = withFraming(upstreamConfig(phase));
     const overrides = listModuleOverrides(config.outputFileTracingRoot ?? process.cwd());
     return {
       ...config,

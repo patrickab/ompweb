@@ -39,6 +39,13 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 
 Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed).
 
+## Embedding (gigachad-bot)
+
+gigachad-bot frames this app as its chat and settings surface.
+
+- **Framing**: `OMP_WEB_FRAME_ANCESTORS` (space or comma separated origins, e.g. `http://127.0.0.1:2999`) lets those origins frame every page: CSP `frame-ancestors 'self' <origins>`, no `X-Frame-Options: DENY` (`custom/framing.ts`). Unset keeps upstream's headers. `/api/files` keeps `SAMEORIGIN`, so DOCX/PDF previews stay blank inside a frame
+- `next build` bakes headers into `.next`, so the value only takes effect after a build. `./run.sh` rebuilds when it differs from the last build (`.next/cf-frame-ancestors`), `npm run dev` reads it at start
+
 ## Theme layer (`custom/theme/`)
 
 - `palette.css`: role colors `--cf-*` per mode, the only place colors are defined. Light applies to every theme, dark to `.dark`/`.omp`
