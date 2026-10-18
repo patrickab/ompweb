@@ -38,7 +38,7 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 - **Wrap an upstream module**: the replacement imports the original by a relative path (`../../../components/X`), which neither bundler redirects. Never `@/components/X` or `./X`, those resolve back to the replacement. Type its props as `ComponentProps<typeof UpstreamX>`, so an upstream prop change fails `tsc`
 - **Add app-wide behavior**: render it from `CustomRoot` in `custom/root.tsx`, e.g. `SelectEnhancer`, which gives every native `<select>` a styled listbox under a mouse (touch keeps the native picker)
 
-Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed), `hooks/useKeyboardShortcuts` (wraps, embedded `new-session`).
+Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed), `hooks/useKeyboardShortcuts` (wraps, embedded `new-session`), `BranchNavigator` (wraps, embedded branch tree).
 
 ## Embedding (gigachad-bot)
 
@@ -51,6 +51,7 @@ gigachad-bot frames this app as its chat and settings surface.
   - In: `open-session` dispatches upstream's `OPEN_SESSION_EVENT` (`lib/notification-client.ts`, the notification-click path). `new-session` calls the callback AppShell hands `useGlobalKeyboardShortcuts` (Ctrl+Alt+N), via the wrapper `custom/overrides/hooks/useKeyboardShortcuts.ts`. `open-settings` clicks the hidden `.sidebar-settings-row`. `set-theme` uses `useTheme`
   - Out: `view` (session id from `?session=`, Settings open = `#workspace-sidebar` absent, polled every 400ms) and `key` for the shortcuts the shell lists in `hello` (Alt+T, Alt+W, ...)
   - Trust: only the parent window, origin fixed by `hello`. CSP `frame-ancestors` already limits the parent to the configured origins
+- **Branch tree**: `custom/overrides/components/BranchNavigator.tsx` wraps upstream. Embedded, it posts `branch-tree` (message previews only) whenever AppShell's tree or active leaf changes, and applies `select-leaf` through upstream's `onLeafChange`. Its props are `ComponentProps<typeof UpstreamBranchNavigator>`
 
 ## Theme layer (`custom/theme/`)
 
