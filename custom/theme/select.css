@@ -1,0 +1,62 @@
+/* Native selects (closed) and the listbox SelectEnhancer opens for them, after Coolfrog's Select. */
+
+select:not([multiple]) {
+  border-color: var(--border) !important;
+  border-radius: var(--radius-control) !important;
+  transition: background-color var(--dur-fast) var(--ease-out-warm), border-color var(--dur-fast) var(--ease-out-warm);
+}
+select:not([multiple]):hover:not(:disabled),
+select[aria-expanded="true"] {
+  background-color: var(--cf-elevated) !important;
+  border-color: var(--border-strong) !important;
+}
+
+.cf-select-list {
+  position: fixed;
+  z-index: 1000;
+  max-width: calc(100vw - 16px);
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--cf-elevated);
+  border-radius: 12px;
+  box-shadow: var(--shadow-pop), var(--cf-inner-highlight);
+  color: var(--text);
+  font-size: var(--text-sm);
+  scrollbar-width: thin;
+  animation: ui-scale-in var(--dur-fast) var(--ease-out-warm) both;
+}
+
+.cf-select-group {
+  padding: 8px 8px 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cf-select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-control);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cf-select-option[aria-selected="true"],
+.cf-select-option[data-highlighted] {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+.cf-select-option[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+.cf-select-option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

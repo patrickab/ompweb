@@ -1,4 +1,4 @@
-// Fork theme, imported once by app/layout.tsx after globals.css.
+// Fork theme, imported once by custom/root.tsx, which app/layout.tsx imports after globals.css.
 //
 // - palette.css: role colors per mode, tokens.css: upstream tokens from them, base.css: page-wide rules
 // - One CSS file per surface after that, add new surfaces as new files here. Surface rules win ties with upstream
@@ -13,3 +13,4 @@ import "./new-session.css";
 import "./chat.css";
 import "./settings.css";
 import "./overlays.css";
+import "./select.css";
