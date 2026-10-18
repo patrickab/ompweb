@@ -14,3 +14,4 @@ import "./chat.css";
 import "./settings.css";
 import "./overlays.css";
 import "./select.css";
+import "./embed.css";

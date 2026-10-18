@@ -46,6 +46,7 @@ gigachad-bot frames this app as its chat and settings surface.
 
 - **Framing**: `OMP_WEB_FRAME_ANCESTORS` (space or comma separated origins, e.g. `http://127.0.0.1:2999`) lets those origins frame every page: CSP `frame-ancestors 'self' <origins>`, no `X-Frame-Options: DENY` (`custom/framing.ts`). Unset keeps upstream's headers. `/api/files` keeps `SAMEORIGIN`, so DOCX/PDF previews stay blank inside a frame
 - `next build` bakes headers into `.next`, so the value only takes effect after a build. `./run.sh` rebuilds when it differs from the last build (`.next/cf-frame-ancestors`), `npm run dev` reads it at start
+- **Embed mode**: inside a frame, `EmbedMode` (`custom/components/EmbedMode.tsx`) adds `html.cf-embed` before hydration and `custom/theme/embed.css` hides ompweb's sidebar, topbar, file panel, Settings Back/close, composer fast/slow and dictation. Hooks: `#workspace-sidebar`, `.sidebar-resize-handle`, `.shell-topbar`, `.right-panel-*`, `.settings-header .settings-back`, `.settings-close-btn`, `.composer-fast-control`, `.composer-slow-control`, `.composer-toolbar button:has(> svg.lucide-mic)`. A renamed hook brings that chrome back inside gigachad-bot
 
 ## Theme layer (`custom/theme/`)
 

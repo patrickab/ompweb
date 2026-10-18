@@ -1,0 +1,20 @@
+/* Embed mode: the app runs inside gigachad-bot's shell (html.cf-embed, set by EmbedMode).
+
+   - gigachad-bot owns navigation: ompweb's sidebar, topbar and file panel go
+   - Settings: Back and close go, the shell's tab closes Settings (Escape still returns to the chat, the shell reopens Settings)
+   - Composer: fast/slow and dictation go, the model and thinking pickers stay
+   - Hidden, not removed: the sidebar keeps its running-session stream and the Settings row the bridge clicks */
+
+html.cf-embed #workspace-sidebar,
+html.cf-embed .sidebar-resize-handle,
+html.cf-embed .shell-topbar,
+html.cf-embed .right-panel-container,
+html.cf-embed .right-panel-resize-handle,
+html.cf-embed .right-panel-backdrop,
+html.cf-embed .composer-fast-control,
+html.cf-embed .composer-slow-control,
+html.cf-embed .settings-header .settings-back,
+html.cf-embed .settings-close-btn,
+html.cf-embed .composer-toolbar button:has(> svg.lucide-mic) {
+  display: none !important;
+}
