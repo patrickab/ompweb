@@ -7,7 +7,7 @@ import { IosFocusZoomGuard } from "@/components/IosFocusZoomGuard";
 import { SIDEBAR_HISTORY_BRIDGE_SCRIPT } from "@/lib/sidebar-history-bridge";
 import { getInstallName } from "@/lib/install-name";
 import "./globals.css";
-import "@/custom/theme";
+import { CustomRoot } from "@/custom/root";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -112,6 +112,7 @@ export default function RootLayout({
       <body translate="no" className="notranslate" style={{ height: "100%", maxHeight: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <IosFocusZoomGuard />
         {children}
+        <CustomRoot />
       </body>
     </html>
   );
