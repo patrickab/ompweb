@@ -38,3 +38,28 @@
   --cf-shadow-soft: color-mix(in oklab, oklch(10% 0.011 83) 32%, transparent);
   --cf-inner-highlight: inset 0 1px 0 0 oklch(100% 0 0 / 0.04);
 }
+
+/* Embedded in gigachad-bot (`html.cf-embed`): the shell's own role tokens, so the frame blends into it.
+   Mirrors gigachad-bot `src/frontend/app/globals.css` `:root` (dark) and `.light`, change them together.
+   `:root:root.cf-embed` (0,3,0) comes later than the dark block above and wins in light mode,
+   the dark variant (0,4,0) wins in dark mode */
+
+:root:root.cf-embed {
+  --cf-ink: oklch(30% 0.012 85);
+  --cf-ink-muted: oklch(46% 0.012 85);
+  --cf-ink-subtle: oklch(58% 0.010 85);
+  --cf-paper: oklch(95% 0.020 85);
+  --cf-surface: oklch(97.5% 0.012 85);
+  --cf-elevated: oklch(99% 0.006 85);
+  --cf-danger: oklch(52% 0.22 25);
+}
+
+:root:root.cf-embed:is(.dark, .omp) {
+  --cf-ink: oklch(94% 0.010 75);
+  --cf-ink-muted: oklch(75% 0.013 70);
+  --cf-ink-subtle: oklch(59% 0.012 65);
+  --cf-paper: oklch(14% 0.008 55);
+  --cf-surface: oklch(18% 0.009 55);
+  --cf-elevated: oklch(22.5% 0.010 55);
+  --cf-danger: oklch(68% 0.20 25);
+}

@@ -56,6 +56,7 @@ gigachad-bot frames this app as its chat and settings surface.
 ## Theme layer (`custom/theme/`)
 
 - `palette.css`: role colors `--cf-*` per mode, the only place colors are defined. Light applies to every theme, dark to `.dark`/`.omp`
+  - Embedded (`html.cf-embed`) it switches to gigachad-bot's role tokens (`src/frontend/app/globals.css`), so the frame blends into the shell. Change both together
 - `tokens.css`: upstream tokens (`--bg`, `--text`, `--accent`, radii, shadows, fonts) derived from the palette
 - `base.css`: page type, focus, switching off upstream decoration. Then one file per surface (`shell.css`, `chat.css`, ...)
 - Register CSS in `index.ts`, never through CSS `@import`: Turbopack does not track `@import`ed files and keeps serving stale CSS, even across restarts
