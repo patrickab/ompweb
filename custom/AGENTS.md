@@ -12,6 +12,21 @@ Goal: rebase onto upstream at any time without merge conflicts. These rules win 
 - Never touch protocol or session logic, it tracks omp versions: `lib/rpc-manager.ts`, `lib/omp/`, `lib/session-*.ts`, `hooks/useAgentSession.ts`, `app/api/`
 - Deliver only the requested scope, propose further work instead of doing it
 
+## Avoiding merge conflicts
+
+The fork pays for every upstream line it changes on every rebase. Apply these in order, take the first that works.
+
+1. **Drop before you change**: a feature gigachad-bot does not need is hidden, not rewritten. CSS in `custom/theme/` (`display: none` on a stable class hook) or embed mode (`html.cf-embed`). Hidden chrome costs no upstream lines and comes back by deleting one rule
+2. **Adapt before you edit**: reach upstream behavior through what it already exposes, never by editing it. Upstream events (`OPEN_SESSION_EVENT`), callbacks handed to hooks (`useGlobalKeyboardShortcuts` options), component props (`onLeafChange`), URL state (`?session=`), existing DOM hooks (`.sidebar-settings-row`). Write the adapter in `custom/`
+3. **Wrap before you replace**: an override that imports the upstream module and adds around it survives upstream changes to its body. A full replacement forks the file, use it only when wrapping cannot reach the behavior
+4. **Seam last**: a new single upstream line only when nothing above works, each in its own commit and in "Seams in use"
+
+- Never change ompweb's server API, protocol or session handling for gigachad-bot. gigachad-bot adapts to ompweb's API (`src/lib/omp_web.py`), not the other way round
+- Type every upstream contact so an upstream change fails `tsc` instead of failing silently: import the upstream symbol, type props as `ComponentProps<typeof Upstream>`. CSS hooks cannot be typed, they go inert, list them under "Embedding"
+- No new dependencies, no edits to `package.json` or `package-lock.json`
+- One concern per commit. The body states `Seam:`, `Upstream contact:`, `On conflict:` and `On breakage:`, and the commit carries its own `custom/AGENTS.md` update
+- Contracts shared with gigachad-bot (`custom/embed/protocol.ts`, `custom/theme/palette.css` embed tokens) change together with their gigachad-bot mirror, the protocol bumps `EMBED_PROTOCOL_VERSION`
+
 ## Git
 
 - `main` mirrors `upstream/main`, fast-forward only: `git fetch upstream && git switch main && git merge --ff-only upstream/main && git push origin main`
