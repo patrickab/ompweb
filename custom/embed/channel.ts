@@ -4,7 +4,7 @@ type ShellMessageType = ShellMessage["type"];
 type ShellHandler<Type extends ShellMessageType> = (message: Extract<ShellMessage, { type: Type }>) => void;
 
 /** Frame messages that describe current state: kept and replayed on every `hello`. */
-const IS_STATE_MESSAGE: Record<FrameMessage["type"], boolean> = { ready: false, view: true, "branch-tree": true, key: false, composer: true };
+const IS_STATE_MESSAGE: Record<FrameMessage["type"], boolean> = { ready: false, view: true, "branch-tree": true, key: false, composer: true, "composer-restore": false };
 
 let shellOrigin: string | null = null;
 let isListening = false;
@@ -47,6 +47,11 @@ export function startEmbedChannel() {
 export function postToShell(message: FrameMessage) {
   if (IS_STATE_MESSAGE[message.type]) latestStateByType.set(message.type, message);
   if (shellOrigin) send(message, shellOrigin);
+}
+
+/** Whether the shell said hello, so `postToShell` reaches it. */
+export function isShellConnected(): boolean {
+  return shellOrigin !== null;
 }
 
 /** Handle one shell message type, returns the unsubscribe. */

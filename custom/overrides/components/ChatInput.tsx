@@ -1,11 +1,12 @@
 "use client";
 
-import { forwardRef, memo, useEffect, useMemo, useRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, memo, useEffect, useMemo, useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { ChatInput as UpstreamChatInput, type AttachedImage, type ChatInputHandle } from "../../../components/ChatInput";
 import { toast } from "@/components/ui/toast";
+import { clearDraft, subscribeDraftRecovery } from "@/lib/draft-store";
 import { selectableThinkingLevels } from "@/lib/thinking-levels";
 import { isEmbedded } from "../../components/EmbedMode";
-import { onShellMessage, postToShell } from "../../embed/channel";
+import { isShellConnected, onShellMessage, postToShell } from "../../embed/channel";
 import type { ComposerImage } from "../../embed/protocol";
 
 export * from "../../../components/ChatInput";
@@ -38,7 +39,7 @@ async function submitLikeComposer(props: Props, text: string, images: AttachedIm
 /**
  * Upstream composer, driven by gigachad-bot's composer while embedded (`custom/theme/embed.css` hides this one).
  *
- * - Out: `composer` state (session, busy, model, thinking level) on change
+ * - Out: `composer` state (session, busy, model, thinking level) on change. `composer-restore` for what omp hands back to the input box
  * - In: `composer-send`, `composer-abort`, `composer-set-model`, `composer-set-thinking`, through the same props upstream's own controls call
  * - Standalone: upstream unchanged
  */
@@ -85,5 +86,19 @@ export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatIn
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
   }, []);
 
-  return <UpstreamChatInput ref={ref} {...props} />;
+  // A recovery (abort withdrew queued messages, queue Edit) goes to the shell. The hidden input box got it too:
+  // drop its draft and remount it empty, so it never resurfaces there.
+  const [hiddenInputGeneration, setHiddenInputGeneration] = useState(0);
+  useEffect(() => {
+    if (!isEmbedded()) return;
+    return subscribeDraftRecovery((key, recovery) => {
+      if (key !== propsRef.current.draftKey || !isShellConnected()) return;
+      const { text, replace = null, images = [] } = recovery;
+      postToShell({ type: "composer-restore", sessionId: composerSessionId(key), text, replace, images });
+      clearDraft(key);
+      setHiddenInputGeneration((generation) => generation + 1);
+    });
+  }, []);
+
+  return <UpstreamChatInput key={hiddenInputGeneration} ref={ref} {...props} />;
 }));

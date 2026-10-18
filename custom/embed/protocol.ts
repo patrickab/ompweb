@@ -5,7 +5,7 @@
  * - Every message carries `channel: EMBED_CHANNEL` so unrelated postMessage traffic is ignored
  */
 export const EMBED_CHANNEL = "omp-embed";
-export const EMBED_PROTOCOL_VERSION = 3;
+export const EMBED_PROTOCOL_VERSION = 4;
 
 export type ThemeMode = "light" | "dark";
 
@@ -60,6 +60,11 @@ export type FrameMessage =
    * Composer state for the shell's composer. `sessionId` is the shown session, null on the new-session screen.
    * `thinkingLevels` is what upstream's reasoning menu offers (`auto`, `off`, ... `max`), empty when it shows none. `thinkingLevel` is the selected one.
    */
-  | { type: "composer"; sessionId: string | null; streaming: boolean; model: ModelRef | null; thinkingLevel: string; thinkingLevels: string[] };
+  | { type: "composer"; sessionId: string | null; streaming: boolean; model: ModelRef | null; thinkingLevel: string; thinkingLevels: string[] }
+  /**
+   * Text and images omp handed back (an abort withdrew queued messages, the queue panel's Edit), for the shell's composer.
+   * Merge like `lib/draft-store.ts` `mergeRecoveredText`: `replace` set and the draft starts with `replace.lead` -> that lead becomes `text`, else `replace.fallback` (or `text`) goes before the draft.
+   */
+  | { type: "composer-restore"; sessionId: string | null; text: string; replace: { lead: string; fallback: string } | null; images: ComposerImage[] };
 
 export type Envelope<Message> = Message & { channel: typeof EMBED_CHANNEL };
