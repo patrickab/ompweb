@@ -4,7 +4,9 @@ type ShellMessageType = ShellMessage["type"];
 type ShellHandler<Type extends ShellMessageType> = (message: Extract<ShellMessage, { type: Type }>) => void;
 
 /** Frame messages that describe current state: kept and replayed on every `hello`. */
-const IS_STATE_MESSAGE: Record<FrameMessage["type"], boolean> = { ready: false, view: true, "branch-tree": true, key: false, composer: true, "composer-restore": false };
+const IS_STATE_MESSAGE: Record<FrameMessage["type"], boolean> = {
+  ready: false, view: true, "branch-tree": true, key: false, composer: true, "composer-restore": false, "composer-completions": false,
+};
 
 let shellOrigin: string | null = null;
 let isListening = false;

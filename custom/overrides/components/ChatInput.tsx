@@ -7,7 +7,9 @@ import { clearDraft, subscribeDraftRecovery } from "@/lib/draft-store";
 import { selectableThinkingLevels } from "@/lib/thinking-levels";
 import { isEmbedded } from "../../components/EmbedMode";
 import { isShellConnected, onShellMessage, postToShell } from "../../embed/channel";
-import type { ComposerImage } from "../../embed/protocol";
+import { commandCompletions, fileCompletions, slashQueryOf } from "../../embed/completions";
+import type { Completion, ComposerImage } from "../../embed/protocol";
+import type { SlashCommandInfo } from "@/hooks/useAgentSession";
 
 export * from "../../../components/ChatInput";
 
@@ -37,10 +39,27 @@ async function submitLikeComposer(props: Props, text: string, images: AttachedIm
 }
 
 /**
+ * Completions for the shell's draft: omp commands for a `/word` draft, else files for an `@` token before the caret.
+ *
+ * - `loadCommands` runs only when the session reported no commands yet, the way upstream's menu asks once per open
+ * - No `cwd` (new session without a directory): no file completions, like upstream
+ */
+async function completionsFor(props: Props, text: string, caret: number, loadCommands: () => Promise<SlashCommandInfo[]>): Promise<Completion[]> {
+  const slashQuery = slashQueryOf(text);
+  if (slashQuery !== null) {
+    const commands = props.slashCommands?.length ? props.slashCommands : await loadCommands();
+    return commandCompletions(commands, text, slashQuery);
+  }
+  if (!props.cwd) return [];
+  return (await fileCompletions(props.cwd, text, caret)) ?? [];
+}
+
+/**
  * Upstream composer, driven by gigachad-bot's composer while embedded (`custom/theme/embed.css` hides this one).
  *
  * - Out: `composer` state (session, busy, model, thinking level) on change. `composer-restore` for what omp hands back to the input box
  * - In: `composer-send`, `composer-abort`, `composer-set-model`, `composer-set-thinking`, through the same props upstream's own controls call
+ * - `composer-complete` is answered with `composer-completions` (commands, `@` files)
  * - Standalone: upstream unchanged
  */
 export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatInput(props, ref) {
@@ -64,9 +83,18 @@ export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatIn
     postToShell({ type: "composer", sessionId, streaming: isStreaming, model, thinkingLevel, thinkingLevels });
   }, [sessionId, isStreaming, provider, modelId, thinkingLevel, thinkingLevels]);
 
+  // One command load per composer key: a session without commands must not reload on every keystroke.
+  const commandsRequestedForRef = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (!isEmbedded()) return;
     const isForThisComposer = (target: string | null) => target === composerSessionId(propsRef.current.draftKey);
+    const loadCommands = async () => {
+      const { draftKey, onLoadSlashCommands } = propsRef.current;
+      if (!onLoadSlashCommands || commandsRequestedForRef.current === draftKey) return [];
+      commandsRequestedForRef.current = draftKey;
+      return onLoadSlashCommands();
+    };
     const unsubscribers = [
       onShellMessage("composer-send", (message) => {
         if (!isForThisComposer(message.sessionId)) return;
@@ -81,6 +109,11 @@ export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatIn
       }),
       onShellMessage("composer-set-thinking", (message) => {
         if (isForThisComposer(message.sessionId)) propsRef.current.onThinkingLevelChange?.(message.level);
+      }),
+      onShellMessage("composer-complete", ({ sessionId: target, requestId, text, caret }) => {
+        if (!isForThisComposer(target)) return;
+        const answer = (items: Completion[]) => postToShell({ type: "composer-completions", sessionId: target, requestId, items });
+        completionsFor(propsRef.current, text, caret, loadCommands).then(answer, () => answer([]));
       }),
     ];
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
