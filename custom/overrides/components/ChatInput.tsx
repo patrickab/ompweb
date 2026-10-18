@@ -1,8 +1,9 @@
 "use client";
 
-import { forwardRef, memo, useEffect, useRef, type ComponentPropsWithoutRef } from "react";
+import { forwardRef, memo, useEffect, useMemo, useRef, type ComponentPropsWithoutRef } from "react";
 import { ChatInput as UpstreamChatInput, type AttachedImage, type ChatInputHandle } from "../../../components/ChatInput";
 import { toast } from "@/components/ui/toast";
+import { selectableThinkingLevels } from "@/lib/thinking-levels";
 import { isEmbedded } from "../../components/EmbedMode";
 import { onShellMessage, postToShell } from "../../embed/channel";
 import type { ComposerImage } from "../../embed/protocol";
@@ -37,23 +38,30 @@ async function submitLikeComposer(props: Props, text: string, images: AttachedIm
 /**
  * Upstream composer, driven by gigachad-bot's composer while embedded (`custom/theme/embed.css` hides this one).
  *
- * - Out: `composer` state (session, busy, model) on change
- * - In: `composer-send`, `composer-abort`, `composer-set-model`, through the same props upstream's own controls call
+ * - Out: `composer` state (session, busy, model, thinking level) on change
+ * - In: `composer-send`, `composer-abort`, `composer-set-model`, `composer-set-thinking`, through the same props upstream's own controls call
  * - Standalone: upstream unchanged
  */
 export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatInput(props, ref) {
   const propsRef = useRef(props);
   useEffect(() => { propsRef.current = props; });
   const sessionId = composerSessionId(props.draftKey);
-  const { isStreaming } = props;
+  const { isStreaming, availableThinkingLevels } = props;
   const provider = props.model?.provider;
   const modelId = props.model?.modelId;
+  const thinkingLevel = props.thinkingLevel ?? "auto";
+  // Upstream shows the reasoning menu only with a change handler, listing `selectableThinkingLevels`.
+  const hasThinkingMenu = Boolean(props.onThinkingLevelChange);
+  const thinkingLevels = useMemo(
+    () => (hasThinkingMenu ? selectableThinkingLevels(availableThinkingLevels) : []),
+    [hasThinkingMenu, availableThinkingLevels],
+  );
 
   useEffect(() => {
     if (!isEmbedded()) return;
     const model = provider && modelId ? { provider, modelId } : null;
-    postToShell({ type: "composer", sessionId, streaming: isStreaming, model });
-  }, [sessionId, isStreaming, provider, modelId]);
+    postToShell({ type: "composer", sessionId, streaming: isStreaming, model, thinkingLevel, thinkingLevels });
+  }, [sessionId, isStreaming, provider, modelId, thinkingLevel, thinkingLevels]);
 
   useEffect(() => {
     if (!isEmbedded()) return;
@@ -69,6 +77,9 @@ export const ChatInput = memo(forwardRef<ChatInputHandle, Props>(function ChatIn
       }),
       onShellMessage("composer-set-model", (message) => {
         if (isForThisComposer(message.sessionId)) propsRef.current.onModelChange?.(message.provider, message.modelId);
+      }),
+      onShellMessage("composer-set-thinking", (message) => {
+        if (isForThisComposer(message.sessionId)) propsRef.current.onThinkingLevelChange?.(message.level);
       }),
     ];
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());

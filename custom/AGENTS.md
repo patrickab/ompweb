@@ -68,9 +68,9 @@ gigachad-bot frames this app as its chat and settings surface.
   - Trust: only the parent window, origin fixed by `hello`. CSP `frame-ancestors` already limits the parent to the configured origins
 - **Branch tree**: `custom/overrides/components/BranchNavigator.tsx` wraps upstream. Embedded, it posts `branch-tree` (message previews only) whenever AppShell's tree or active leaf changes, and applies `select-leaf` through upstream's `onLeafChange`. Its props are `ComponentProps<typeof UpstreamBranchNavigator>`
 - **Composer**: gigachad-bot's composer and model selector replace ompweb's. `custom/overrides/components/ChatInput.tsx` wraps upstream and keeps it mounted but hidden, so ChatWindow's send path (optimistic turn, SSE connect, queue, new session) stays upstream's
-  - Out: `composer` (session from `draftKey`, `isStreaming`, `model`) on change
-  - In: `composer-send` submits like the input box: `onBuiltinCommand` for `/…`, `onFollowUp` while busy, else `onSend`. `composer-abort` calls `onAbort`, `composer-set-model` `onModelChange`. Each names its session, a composer for another one ignores it
-  - Lost in embed: slash and `@` autocomplete, word prediction, thinking/fast/slow pickers, `!` bash mode, steer-or-queue choice. The queue panel stays, but its Edit and the texts an abort withdraws land in the hidden input box
+  - Out: `composer` (session from `draftKey`, `isStreaming`, `model`, `thinkingLevel` and the levels upstream's reasoning menu lists) on change
+  - In: `composer-send` submits like the input box: `onBuiltinCommand` for `/…`, `onFollowUp` while busy, else `onSend`. `composer-abort` calls `onAbort`, `composer-set-model` `onModelChange`, `composer-set-thinking` `onThinkingLevelChange`. Each names its session, a composer for another one ignores it
+  - Lost in embed: slash and `@` autocomplete, word prediction, fast/slow pickers, `!` bash mode, steer-or-queue choice. The queue panel stays, but its Edit and the texts an abort withdraws land in the hidden input box
   - On breakage: a renamed `ChatInput` prop fails `tsc` (props are `ComponentPropsWithoutRef<typeof UpstreamChatInput>`). Upstream logic added to the input box's own submit is not mirrored, compare `handleSend` in `components/ChatInput.tsx` on rebase
 
 ## Theme layer (`custom/theme/`)
