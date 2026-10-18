@@ -2,7 +2,7 @@
 
    - gigachad-bot owns navigation: ompweb's sidebar, topbar and file panel go
    - Settings: Back and close go, the shell's tab closes Settings (Escape still returns to the chat, the shell reopens Settings)
-   - Composer: fast/slow and dictation go, the model and thinking pickers stay
+   - Composer: the input box goes, gigachad-bot's composer drives it (`custom/overrides/components/ChatInput.tsx`). The queue and status bar above it stay
    - Hidden, not removed: the sidebar keeps its running-session stream and the Settings row the bridge clicks */
 
 html.cf-embed #workspace-sidebar,
@@ -11,10 +11,14 @@ html.cf-embed .shell-topbar,
 html.cf-embed .right-panel-container,
 html.cf-embed .right-panel-resize-handle,
 html.cf-embed .right-panel-backdrop,
-html.cf-embed .composer-fast-control,
-html.cf-embed .composer-slow-control,
 html.cf-embed .settings-header .settings-back,
 html.cf-embed .settings-close-btn,
-html.cf-embed .composer-toolbar button:has(> svg.lucide-mic) {
+html.cf-embed .chat-input-shell {
   display: none !important;
+}
+
+/* The queue or status bar sat on the input box's top edge, close its bottom */
+html.cf-embed :has(+ .chat-input-shell) {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent) !important;
+  border-radius: var(--radius-card) !important;
 }
