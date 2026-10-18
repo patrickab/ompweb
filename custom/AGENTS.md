@@ -38,7 +38,7 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 - **Wrap an upstream module**: the replacement imports the original by a relative path (`../../../components/X`), which neither bundler redirects. Never `@/components/X` or `./X`, those resolve back to the replacement. Type its props as `ComponentProps<typeof UpstreamX>`, so an upstream prop change fails `tsc`
 - **Add app-wide behavior**: render it from `CustomRoot` in `custom/root.tsx`, e.g. `SelectEnhancer`, which gives every native `<select>` a styled listbox under a mouse (touch keeps the native picker)
 
-Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed).
+Current overrides: `ThemeSwitcher` (light/dark toggle instead of the 15-theme menu), `LanguageSwitcher` (removed), `hooks/useKeyboardShortcuts` (wraps, embedded `new-session`).
 
 ## Embedding (gigachad-bot)
 
@@ -47,6 +47,10 @@ gigachad-bot frames this app as its chat and settings surface.
 - **Framing**: `OMP_WEB_FRAME_ANCESTORS` (space or comma separated origins, e.g. `http://127.0.0.1:2999`) lets those origins frame every page: CSP `frame-ancestors 'self' <origins>`, no `X-Frame-Options: DENY` (`custom/framing.ts`). Unset keeps upstream's headers. `/api/files` keeps `SAMEORIGIN`, so DOCX/PDF previews stay blank inside a frame
 - `next build` bakes headers into `.next`, so the value only takes effect after a build. `./run.sh` rebuilds when it differs from the last build (`.next/cf-frame-ancestors`), `npm run dev` reads it at start
 - **Embed mode**: inside a frame, `EmbedMode` (`custom/components/EmbedMode.tsx`) adds `html.cf-embed` before hydration and `custom/theme/embed.css` hides ompweb's sidebar, topbar, file panel, Settings Back/close, composer fast/slow and dictation. Hooks: `#workspace-sidebar`, `.sidebar-resize-handle`, `.shell-topbar`, `.right-panel-*`, `.settings-header .settings-back`, `.settings-close-btn`, `.composer-fast-control`, `.composer-slow-control`, `.composer-toolbar button:has(> svg.lucide-mic)`. A renamed hook brings that chrome back inside gigachad-bot
+- **Bridge**: `EmbedBridge` talks to the shell over postMessage, protocol in `custom/embed/protocol.ts`, mirrored in gigachad-bot `src/frontend/features/omp/protocol.ts`. Change both and bump `EMBED_PROTOCOL_VERSION`
+  - In: `open-session` dispatches upstream's `OPEN_SESSION_EVENT` (`lib/notification-client.ts`, the notification-click path). `new-session` calls the callback AppShell hands `useGlobalKeyboardShortcuts` (Ctrl+Alt+N), via the wrapper `custom/overrides/hooks/useKeyboardShortcuts.ts`. `open-settings` clicks the hidden `.sidebar-settings-row`. `set-theme` uses `useTheme`
+  - Out: `view` (session id from `?session=`, Settings open = `#workspace-sidebar` absent, polled every 400ms) and `key` for the shortcuts the shell lists in `hello` (Alt+T, Alt+W, ...)
+  - Trust: only the parent window, origin fixed by `hello`. CSP `frame-ancestors` already limits the parent to the configured origins
 
 ## Theme layer (`custom/theme/`)
 

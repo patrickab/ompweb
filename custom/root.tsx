@@ -1,4 +1,5 @@
 import "./theme";
+import { EmbedBridge } from "./components/EmbedBridge";
 import { EmbedMode } from "./components/EmbedMode";
 import { SelectEnhancer } from "./components/SelectEnhancer";
 
@@ -7,6 +8,7 @@ export function CustomRoot() {
   return (
     <>
       <EmbedMode />
+      <EmbedBridge />
       <SelectEnhancer />
     </>
   );
