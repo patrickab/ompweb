@@ -1,0 +1,2 @@
+# The root .gitignore ignores *.tgz. Vendored packages are committed: package.json depends on them by file path.
+!*.tgz
