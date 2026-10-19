@@ -34,6 +34,8 @@ export type TranscriptRow =
 export interface PlanOptions {
   /** Mirrors omp's `hideThinkingBlock`: drop thinking blocks entirely. */
   hideThinking?: boolean;
+  /** Keep plain turns together for an outer turn renderer, without adding activity folds. */
+  groupPlainTurns?: boolean;
 }
 
 // A user message normally anchors a turn. When compaction fires mid-turn, pi
@@ -250,7 +252,7 @@ export function planTranscriptRows(messages: AgentMessage[], options: PlanOption
     let endIdx = userIdx + 1;
     while (endIdx < messages.length && !isGroupAnchor(messages[endIdx])) endIdx += 1;
     const segments = planTurnSegments(messages, userIdx, endIdx, options);
-    if (segments.some((segment) => segment.kind === "activity")) {
+    if (options.groupPlainTurns || segments.some((segment) => segment.kind === "activity")) {
       rows.push({ kind: "group", userIndex: userIdx, endIndex: endIdx, segments });
     } else {
       // Nothing to fold: render the anchor and the rest as standalone messages.

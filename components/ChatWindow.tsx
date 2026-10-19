@@ -8,6 +8,7 @@ import { translate, useI18n } from "@/lib/i18n";
 import { collectToolResults, isGroupAnchor, planTranscriptRows, type ActivityPiece, type TranscriptRow } from "@/lib/chat-transcript-plan";
 import { resolveForkTargets } from "@/lib/chat-fork";
 import { MessageView } from "./MessageView";
+import { FullHistory, TranscriptTurn } from "@/custom/components/TranscriptTurn";
 import { ChatInput, type ChatInputHandle } from "./ChatInput";
 import { ExtensionDialog } from "./ExtensionDialog";
 import { SubagentTranscriptDialog } from "./SubagentTranscriptDialog";
@@ -362,11 +363,36 @@ const CommittedTranscript = memo(function CommittedTranscript({
     );
   };
 
+  /** One anchored turn: the prompt plus the nodes that answer it. TranscriptTurn decides how they sit together. */
+  const renderTurn = (userIdx: number, endIdx: number, answer: ReactNode[], live: boolean): ReactNode => {
+    let replyIdx = -1;
+    for (let idx = endIdx - 1; idx > userIdx && replyIdx < 0; idx--) if (messages[idx].role === "assistant") replyIdx = idx;
+    const forkTarget = forkTargets[replyIdx < 0 ? userIdx : replyIdx];
+    const turnId = entryIds[userIdx] ?? `index-${userIdx}`;
+    return (
+      <TranscriptTurn
+        key={`turn-${turnId}`}
+        turnId={turnId}
+        sessionId={sessionId}
+        cwd={messageCwd}
+        onOpenFile={onOpenFile}
+        messages={messages}
+        userIndex={userIdx}
+        endIndex={endIdx}
+        live={live}
+        fork={!sessionBusy && !isNew && forkTarget ? { ...forkTarget, onFork: handleFork, forking: forkingEntryId === forkTarget.entryId, disabled: forkingEntryId !== null } : undefined}
+        question={renderMessage(userIdx)}
+      >
+        {answer}
+      </TranscriptTurn>
+    );
+  };
+
   // Rows are plain descriptors; element creation below only happens for the
   // visible window. Invisible history never allocates React elements, so long
   // sessions pay element cost proportional to the visible window instead of
   // the whole transcript.
-  const rows = useMemo<TranscriptRow[]>(() => planTranscriptRows(messages, { hideThinking: hideThinkingBlock }), [messages, hideThinkingBlock]);
+  const rows = useMemo<TranscriptRow[]>(() => planTranscriptRows(messages, { hideThinking: hideThinkingBlock, groupPlainTurns: true }), [messages, hideThinkingBlock]);
   const isLiveTail = (row: TranscriptRow): boolean => {
     if (row.kind !== "group") return false;
     // `sessionBusy` only goes true for a run omp-web owns, so a session driven
@@ -402,17 +428,18 @@ const CommittedTranscript = memo(function CommittedTranscript({
       continue;
     }
     const { userIndex: userIdx, endIndex: endIdx, segments } = row;
+    const turn: ReactNode[] = [];
 
     if (isLiveTail(row)) {
       // Live tail: render the running turn flat so streaming updates and tool
       // progress stay in view; it folds once the run ends.
-      for (let renderIdx = userIdx; renderIdx < endIdx; renderIdx++) {
-        rendered.push(renderMessage(renderIdx));
+      for (let renderIdx = userIdx + 1; renderIdx < endIdx; renderIdx++) {
+        turn.push(renderMessage(renderIdx));
       }
+      rendered.push(renderTurn(userIdx, endIdx, turn, true));
       continue;
     }
 
-    rendered.push(renderMessage(userIdx));
     // A message split across segments keeps its navigation ref on the first one.
     const attached = new Set<number>();
     segments.forEach((segment, segmentIdx) => {
@@ -420,7 +447,7 @@ const CommittedTranscript = memo(function CommittedTranscript({
         const msg = messages[segment.index] as AssistantMessage;
         const override = withAssistantBlocks(msg, segment.blocks, { omitUsage: !segment.last });
         if (!segment.last) override.errorMessage = undefined;
-        rendered.push(renderMessage(segment.index, {
+        turn.push(renderMessage(segment.index, {
           attachRef: !attached.has(segment.index),
           keyPrefix: `text-${segmentIdx}`,
           messageOverride: override,
@@ -434,7 +461,7 @@ const CommittedTranscript = memo(function CommittedTranscript({
         .map((piece) => visibleRefIndexByMessage.get(piece.index))
         .find((value): value is number => typeof value === "number");
       for (const piece of segment.pieces) attached.add(piece.index);
-      rendered.push(
+      turn.push(
         <div
           key={`activity-${userIdx}-${segmentIdx}`}
           ref={refIdx === undefined ? undefined : (el) => { messageRefs.current[refIdx] = el; }}
@@ -445,6 +472,7 @@ const CommittedTranscript = memo(function CommittedTranscript({
         </div>,
       );
     });
+    rendered.push(renderTurn(userIdx, endIdx, turn, false));
   }
   return (
     <>
@@ -1264,6 +1292,7 @@ export function ChatWindow({ session, newSessionCwd, newSessionWorkspace, toolCa
               <ExtensionStatusBar statuses={extensionStatuses} />
               <ExtensionWidgets widgets={aboveEditorWidgets} />
 
+            <FullHistory loading={loading} error={error} hasCompaction={conversationMeta.hasCompaction} showPreCompactionHistory={showPreCompactionHistory} togglePreCompactionHistory={togglePreCompactionHistory}>
             {conversationMeta.hasCompaction && (
               <div
                 style={{
@@ -1287,6 +1316,7 @@ export function ChatWindow({ session, newSessionCwd, newSessionWorkspace, toolCa
                 </button>
               </div>
             )}
+            </FullHistory>
             <CommittedTranscript
               messages={messages}
               entryIds={entryIds}

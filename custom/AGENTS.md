@@ -23,7 +23,7 @@ The fork pays for every upstream line it changes on every rebase. Apply these in
 
 - Never change ompweb's server API, protocol or session handling for gigachad-bot. gigachad-bot adapts to ompweb's API (`src/lib/omp_web.py`), not the other way round
 - Type every upstream contact so an upstream change fails `tsc` instead of failing silently: import the upstream symbol, type props as `ComponentProps<typeof Upstream>`. CSS hooks cannot be typed, they go inert, list them under "Embedding"
-- No new dependencies or package manifest/lock changes without explicit approval. Approved exception: `@gigachad/chat-ui` and its rendering dependencies, plus registering `custom/*.test.mjs` in the test command.
+- No new dependencies or package manifest/lock changes without explicit approval. Approved exception: `@gigachad/chat-ui` (formerly `@gigachad/markdown`) and its rendering dependencies, plus registering `custom/*.test.mjs` in the test command.
 - One concern per commit. The body states `Seam:`, `Upstream contact:`, `On conflict:` and `On breakage:`, and the commit carries its own `custom/AGENTS.md` update
 - Contracts shared with gigachad-bot (`custom/embed/protocol.ts`, `custom/theme/palette.css` embed tokens) change together with their gigachad-bot mirror, the protocol bumps `EMBED_PROTOCOL_VERSION`
 
@@ -45,6 +45,9 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 | `next.config.ts` | `import { withCustom } from "./custom/next.config";` | `custom/next.config.ts` |
 | `next.config.ts` | `export default withCustom(nextConfig);` | module overrides, see below |
 | `AGENTS.md` | pointer line at the top | this file |
+| `components/ChatWindow.tsx` | import `custom/components/TranscriptTurn`, wrap planned turn nodes, opt into `groupPlainTurns`, wrap the history selector in `FullHistory` | embedded Q&A presentation and existing full-history callback, refs/history/fork behavior retained |
+| `lib/chat-transcript-plan.ts` | optional `PlanOptions.groupPlainTurns` and its grouping condition | keeps plain Q&A indivisible at history page boundaries, default planner behavior unchanged |
+| `components/MessageView.tsx` | `message-user-footer`, `message-assistant-footer` and `message-model-label` class hooks | embedded-only chrome hiding in `custom/theme/chat-ui.css` |
 | `package.json`, `package-lock.json` | local `@gigachad/chat-ui` artifact and `custom/*.test.mjs` test registration | approved shared conversation UI dependency and integration regression coverage |
 
 ## Extension points
@@ -54,7 +57,7 @@ Every upstream line the fork changes. Keep this table complete, it is the rebase
 - **Wrap an upstream module**: the replacement imports the original by a relative path (`../../../components/X`), which neither bundler redirects. Never `@/components/X` or `./X`, those resolve back to the replacement. Type its props as `ComponentProps<typeof UpstreamX>`, so an upstream prop change fails `tsc`
 - **Add app-wide behavior**: render it from `CustomRoot` in `custom/root.tsx`, e.g. `SelectEnhancer`, which gives every native `<select>` a styled listbox under a mouse (touch keeps the native picker)
 
-Current overrides: `ThemeSwitcher` (light/dark toggle), `LanguageSwitcher` (removed), `hooks/useKeyboardShortcuts` (embedded new session), `BranchNavigator` (embedded branch tree), `ChatInput` (embedded composer) and `MarkdownBody` (shared conversation rendering). Each wraps upstream.
+Current overrides: `ThemeSwitcher` (light/dark toggle), `LanguageSwitcher` (removed), `hooks/useKeyboardShortcuts` (embedded new session), `BranchNavigator` (embedded branch tree), `ChatInput` (embedded composer), `MessageView` (card-owned actions) and `MarkdownBody` (shared conversation rendering). Each wraps upstream.
 
 ## Embedding (gigachad-bot)
 
@@ -75,10 +78,13 @@ gigachad-bot frames this app as its chat and settings surface.
   - Lost in embed: word prediction, fast/slow pickers, steer-or-queue choice, builtin commands in the menu (typed ones still run)
   - On breakage: a renamed `ChatInput` prop or `file-fuzzy`/`ChatInput-slash-commands` helper fails `tsc` (props are `ComponentPropsWithoutRef<typeof UpstreamChatInput>`). Upstream logic added to the input box's own submit or menus is not mirrored, compare `handleSend`, `filteredSlashCommands` and `applyAtCompletion` in `components/ChatInput.tsx` on rebase. A changed `/api/file-index` response empties the file list. Text upstream puts back into the input box any other way than `recoverDraft` stays hidden
 
-- **Shared conversation UI**: canonical source is gigachad-bot `src/frontend/packages/chat-ui/` (`@gigachad/chat-ui`: markdown renderer, `markdown.css`). The shell consumes that source, this fork installs the versioned `custom/vendor/gigachad-chat-ui-<version>.tgz` artifact. No sibling checkout is required at install or runtime. From the shell's `src/frontend`, run `node packages/chat-ui/pack.mjs --out "$HOME/git/ompweb/custom/vendor"`, add `--check` to detect stale artifacts. Bump its version for shipped changes, install the matching tarball in ompweb with `npm install --save --ignore-scripts ./custom/vendor/gigachad-chat-ui-<version>.tgz`, then commit manifest, lock and artifact together.
+- **Q&A cards**: `custom/components/TranscriptTurn.tsx` receives typed turn boundaries, rendered question/answer nodes, file-link context and upstream fork state from `ChatWindow`. Embedded user turns become `QaTurn` cards, standalone and non-user anchors return the original nodes. `QaTurn` composes gigachad-bot's shared turn components (`TurnCard`, `TurnHeader`, `TurnPreview`, `TurnRegion`, `TurnSurface`, `CopyAction`, `ForkAction` from `@gigachad/chat-ui`), so the cards render and look exactly like gigachad's local chat. Never restyle them here, change the package. `groupPlainTurns` keeps text-only turns together before upstream history windowing. `FullHistory` invokes the existing `togglePreCompactionHistory` callback once for a loaded compacted view, including available earlier messages automatically embedded. It retains the native selector standalone. History loading, activity folding, tool/thinking rendering and streaming stay upstream-owned.
+  - Older turns start collapsed with an always-visible answer preview capped at 12.5vh and tool names. Only the header toggles, so preview scrolling and selection do not expand the card. User choices survive paging by session/entry id.
+  - Copy uses original question/answer markdown, excluding reasoning and tool results. Fork invokes upstream's resolved target/callback and respects its busy state. There is no delete action: persisted message deletion is unsupported by OMP and is explicitly deferred. Never rewrite JSONL behind a live session.
+  - `MessageView` keeps messages intact and suppresses only callbacks owned by the card. `custom/theme/chat-ui.css` maps the package's role tokens and hides native copy/footer/model chrome through `.message-copy-actions`, `.message-user-footer`, `.message-assistant-footer`, `.message-model-label`, `.chat-message-card`, `.chat-message` and `.message-overflow-toggle`. Renamed hooks restore redundant chrome rather than change session behavior.
+- **Shared conversation UI**: canonical source is gigachad-bot `src/frontend/packages/chat-ui/` (`@gigachad/chat-ui`: turn components, `turn.css`, markdown renderer, `markdown.css`). The shell consumes that source, this fork installs the versioned `custom/vendor/gigachad-chat-ui-<version>.tgz` artifact. No sibling checkout is required at install or runtime. From the shell's `src/frontend`, run `node packages/chat-ui/pack.mjs --out "$HOME/git/ompweb/custom/vendor"`, add `--check` to detect stale artifacts. Bump its version for shipped changes, install the matching tarball in ompweb with `npm install --save --ignore-scripts ./custom/vendor/gigachad-chat-ui-<version>.tgz`, then commit manifest, lock and artifact together.
   - `EmbeddedMarkdown` uses the shared Streamdown/KaTeX pipeline and upstream file/agent/GitHub link helpers, lightbox and code renderers. `MarkdownBody`'s typed wrapper selects embedded conversation text (`undefined` / `markdown-user-message` class); other classes and standalone retain upstream rendering. A new class fails closed to upstream. Compare the adapter's link/image policy with upstream `MarkdownBody` on rebase.
-  - `custom/theme/chat-ui.css` maps the package's role tokens. A visual change belongs in the package, never here.
-  - Verify both apps' typechecks, `custom/*.test.mjs`, upstream markdown tests and shell rendering tests.
+  - Verify both apps' typechecks, `custom/*.test.mjs`, upstream message/markdown/fork/transcript tests and shell rendering tests. Check actual embedded history paging, card focus/preview scrolling, tab switching and standalone layout after serving matching sources. Do not fork or prompt in existing sessions to test actions.
 
 ## Theme layer (`custom/theme/`)
 
