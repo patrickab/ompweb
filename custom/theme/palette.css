@@ -48,18 +48,28 @@
   --cf-ink: oklch(30% 0.012 85);
   --cf-ink-muted: oklch(46% 0.012 85);
   --cf-ink-subtle: oklch(58% 0.010 85);
+  --cf-ink-faint: oklch(72% 0.008 85);
   --cf-paper: oklch(95% 0.020 85);
   --cf-surface: oklch(97.5% 0.012 85);
   --cf-elevated: oklch(99% 0.006 85);
   --cf-danger: oklch(52% 0.22 25);
+  --cf-chat-shadow-color: oklch(35% 0.01 85);
+  --cf-chat-shadow: 0 1px 2px color-mix(in oklab, var(--cf-chat-shadow-color) 6%, transparent),
+                    0 2px 8px color-mix(in oklab, var(--cf-chat-shadow-color) 5%, transparent);
+  --cf-inner-highlight: inset 0 1px 0 0 oklch(100% 0 0 / 0.5);
 }
 
 :root:root.cf-embed:is(.dark, .omp) {
   --cf-ink: oklch(94% 0.010 75);
   --cf-ink-muted: oklch(75% 0.013 70);
   --cf-ink-subtle: oklch(59% 0.012 65);
-  --cf-paper: oklch(14% 0.008 55);
-  --cf-surface: oklch(18% 0.009 55);
-  --cf-elevated: oklch(22.5% 0.010 55);
+  --cf-ink-faint: oklch(48% 0.010 60);
+  --cf-paper: oklch(13% 0.006 70);
+  --cf-surface: oklch(16.5% 0.007 70);
+  --cf-elevated: oklch(19% 0.008 70);
   --cf-danger: oklch(68% 0.20 25);
+  --cf-chat-shadow-color: oklch(4% 0.004 70);
+  --cf-chat-shadow: 0 1px 2px color-mix(in oklab, var(--cf-chat-shadow-color) 40%, transparent),
+                    0 2px 8px color-mix(in oklab, var(--cf-chat-shadow-color) 30%, transparent);
+  --cf-inner-highlight: inset 0 1px 0 0 oklch(100% 0 0 / 0.05);
 }
