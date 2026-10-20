@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
-    "@gigachad/chat-ui": "file:custom/vendor/gigachad-chat-ui-1.0.0.tgz",
+    "@gigachad/chat-ui": "file:custom/vendor/gigachad-chat-ui-1.1.1.tgz",
     "cmdk": "^1.1.1",
     "dbus-next": "^0.10.2",
     "jiti": "^2.7.0",

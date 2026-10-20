@@ -4,10 +4,11 @@
 // - One CSS file per surface after that, add new surfaces as new files here. Surface rules win ties with upstream
 //   because Next keeps CSS in import order and layout.tsx imports this after globals.css
 // - Import CSS from here, never via CSS @import: Turbopack does not track @import'ed files, edits would not rebuild
-// - `@gigachad/chat-ui` is gigachad-bot's shared conversation UI (Q&A cards, prose), chat-ui.css maps its role tokens
+// - `@gigachad/chat-ui` is gigachad-bot's shared UI: Q&A cards, prose, and palette.css with the role colors palette.css and chat-ui.css map
 import "katex/dist/katex.min.css";
 import "@gigachad/chat-ui/markdown.css";
 import "@gigachad/chat-ui/turn.css";
+import "@gigachad/chat-ui/palette.css";
 import "./fonts.css";
 import "./palette.css";
 import "./tokens.css";

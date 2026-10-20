@@ -3,9 +3,8 @@
    The package owns every card, action and prose rule. This file only maps its role tokens and adapts the upstream
    nodes an expanded card wraps. A visual change belongs in the package, never here.
 
-   - Tokens: mapped on the package roots alone, so no upstream token or surface changes. Light and dark mirror the
-     shell's `:root.light` and `:root` blocks in gigachad-bot `src/frontend/app/globals.css` (dividers 24%/42% light,
-     11%/22% dark), change them together. Ink, surface and shadow roles come from `palette.css`, whose embed values are the shell's
+   - Tokens: mapped on the package roots alone, so no upstream token or surface changes. Ink, surface and shadow
+     roles come from `palette.css`, dividers straight from the package palette (`--gc-<mode>-*`), the values the shell uses
    - Upstream hooks, scoped to `.gc-turn-content`: `.chat-message-card` (user bubble) and its wrappers, `.chat-message`
      (assistant row), `.message-user-footer`, `.message-assistant-footer`, `.message-model-label` (native chrome),
      `.message-overflow-toggle` (a control after the question's text) */
@@ -21,15 +20,15 @@
   --danger: var(--cf-danger);
   --shadow-sm: var(--cf-chat-shadow);
   --inner-highlight: var(--cf-inner-highlight);
-  --divider: color-mix(in oklab, var(--cf-ink) 24%, transparent);
-  --divider-strong: color-mix(in oklab, var(--cf-ink) 42%, transparent);
+  --divider: var(--gc-light-divider);
+  --divider-strong: var(--gc-light-divider-strong);
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
   --font-symbols: "Symbols Nerd Font Mono";
 }
 :root:is(.dark, .omp) :is(.gc-turn, [data-markdown-root]) {
-  --divider: color-mix(in oklab, var(--cf-ink) 11%, transparent);
-  --divider-strong: color-mix(in oklab, var(--cf-ink) 22%, transparent);
+  --divider: var(--gc-dark-divider);
+  --divider-strong: var(--gc-dark-divider-strong);
 }
 
 /* The lightbox button around a markdown image, as upstream's `.markdown-body .image-clickable` */

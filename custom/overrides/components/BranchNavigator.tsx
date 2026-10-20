@@ -5,7 +5,7 @@ import { BranchNavigator as UpstreamBranchNavigator } from "../../../components/
 import type { SessionEntry, SessionTreeNode } from "@/lib/types";
 import { isEmbedded } from "../../components/EmbedMode";
 import { onShellMessage, postToShell } from "../../embed/channel";
-import type { BranchNode } from "../../embed/protocol";
+import type { BranchNode } from "@gigachad/chat-ui/protocol";
 
 type Props = ComponentProps<typeof UpstreamBranchNavigator>;
 

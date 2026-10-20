@@ -8,7 +8,7 @@ import { selectableThinkingLevels } from "@/lib/thinking-levels";
 import { isEmbedded } from "../../components/EmbedMode";
 import { isShellConnected, onShellMessage, postToShell } from "../../embed/channel";
 import { commandCompletions, fileCompletions, slashQueryOf } from "../../embed/completions";
-import type { Completion, ComposerImage } from "../../embed/protocol";
+import type { Completion, ComposerImage } from "@gigachad/chat-ui/protocol";
 import type { SlashCommandInfo } from "@/hooks/useAgentSession";
 
 export * from "../../../components/ChatInput";

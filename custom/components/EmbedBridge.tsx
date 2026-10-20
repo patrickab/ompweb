@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { OPEN_SESSION_EVENT } from "@/lib/notification-client";
 import { onShellMessage, postToShell, startEmbedChannel } from "../embed/channel";
-import type { FrameMessage, KeyChord } from "../embed/protocol";
+import type { FrameMessage, KeyChord } from "@gigachad/chat-ui/protocol";
 import { isEmbedded } from "./EmbedMode";
 
 const VIEW_POLL_MS = 400;
@@ -36,7 +36,7 @@ function openSettings() {
 }
 
 /**
- * Connect the app to gigachad-bot's shell while it runs in its frame (`custom/embed/protocol.ts`).
+ * Connect the app to gigachad-bot's shell while it runs in its frame (`@gigachad/chat-ui/protocol`).
  *
  * - In: open a session (upstream's notification-click event), open Settings, theme. New session: `custom/overrides/hooks/useKeyboardShortcuts.ts`
  * - Out: the current view, polled from the URL and the sidebar's presence, and the shell's own shortcuts

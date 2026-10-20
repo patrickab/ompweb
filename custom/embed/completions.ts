@@ -1,7 +1,7 @@
 import { SLASH_SOURCE_ORDER, slashMatchRank } from "@/components/ChatInput-slash-commands";
 import type { SlashCommandInfo } from "@/hooks/useAgentSession";
 import { buildAtInsertText, buildEntriesFromFiles, extractAtQuery, filterFileEntries, type FileIndexEntry } from "@/lib/file-fuzzy";
-import type { Completion } from "./protocol";
+import type { Completion } from "@gigachad/chat-ui/protocol";
 
 const COMMAND_LIMIT = 50;
 /** `slashMatchRank` for a command that matches neither name nor description. */

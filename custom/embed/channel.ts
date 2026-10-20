@@ -1,11 +1,11 @@
-import { EMBED_CHANNEL, EMBED_PROTOCOL_VERSION, type Envelope, type FrameMessage, type ShellMessage } from "./protocol";
+import { EMBED_CHANNEL, EMBED_PROTOCOL_VERSION, type Envelope, type FrameMessage, type ShellMessage } from "@gigachad/chat-ui/protocol";
 
 type ShellMessageType = ShellMessage["type"];
 type ShellHandler<Type extends ShellMessageType> = (message: Extract<ShellMessage, { type: Type }>) => void;
 
 /** Frame messages that describe current state: kept and replayed on every `hello`. */
 const IS_STATE_MESSAGE: Record<FrameMessage["type"], boolean> = {
-  ready: false, view: true, "branch-tree": true, key: false, composer: true, "composer-restore": false, "composer-completions": false,
+  ready: false, view: true, "branch-tree": true, key: false, composer: true, "composer-restore": false, "composer-completions": false, "open-file": false,
 };
 
 let shellOrigin: string | null = null;
