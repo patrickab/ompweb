@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useGlobalKeyboardShortcuts as upstreamUseGlobalKeyboardShortcuts } from "../../../hooks/useKeyboardShortcuts";
 import { isEmbedded } from "../../components/EmbedMode";
-import { onShellMessage } from "../../embed/channel";
+import { onShellMessage, startEmbedChannel } from "../../embed/channel";
 
 export { registerAbortHandler } from "../../../hooks/useKeyboardShortcuts";
 
@@ -22,7 +22,9 @@ export function useGlobalKeyboardShortcuts(options: ShortcutOptions): void {
 
   useEffect(() => {
     if (!isEmbedded()) return;
-    return onShellMessage("new-session", (message) => onNewSessionRef.current?.(message.cwd));
+    const unsubscribe = onShellMessage("new-session", (message) => onNewSessionRef.current?.(message.cwd));
+    startEmbedChannel();
+    return unsubscribe;
   }, []);
 
   upstreamUseGlobalKeyboardShortcuts(options);

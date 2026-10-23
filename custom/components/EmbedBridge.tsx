@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { OPEN_SESSION_EVENT } from "@/lib/notification-client";
-import { onShellMessage, postToShell, startEmbedChannel } from "../embed/channel";
+import { onShellMessage, postToShell } from "../embed/channel";
 import type { FrameMessage, KeyChord } from "@gigachad/chat-ui/protocol";
 import { isEmbedded } from "./EmbedMode";
 
@@ -75,7 +75,6 @@ export function EmbedBridge() {
     window.addEventListener("keydown", forwardShellShortcut, true);
     const viewPoll = window.setInterval(reportViewChange, VIEW_POLL_MS);
     reportViewChange();
-    startEmbedChannel();
 
     return () => {
       unsubscribers.forEach((unsubscribe) => unsubscribe());
